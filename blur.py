@@ -1,4 +1,3 @@
-import math
 from pil_manager import *
 
 def convert_2d(array, height, width):
@@ -26,40 +25,34 @@ def add_pixel(pixel1, pixel2):
         pixel1[2] + pixel2[2],
     )
 
-def getNeighbors(x, y, array):
-    return [
-        array[y-2][x-2],
-        array[y-2][x-1],
-        array[y-2][x],
-        array[y-2][x+1],
-        array[y-2][x+2],
-        array[y-1][x-2],
-        array[y-1][x-1],
-        array[y-1][x],
-        array[y-1][x+1],
-        array[y-1][x+2],
-        array[y][x-2],
-        array[y][x-1],
-        array[y][x+1],
-        array[y][x+2],
-        array[y+1][x-2],
-        array[y+1][x-1],
-        array[y+1][x],
-        array[y+1][x+1],
-        array[y+1][x+2],
-        array[y+2][x-2],
-        array[y+2][x-1],
-        array[y+2][x],
-        array[y+2][x+1],
-        array[y+2][x+2],
-    ]
+
+def getNeighbors(x, y, array, radius):
+    neighbors = []
+    for y_p in range(y-radius, y+radius+1):
+        for x_p in range(x-radius, x+radius):
+            neighbors.append(array[y_p][x_p])
+    return neighbors
+
 
 def get_average(x, y, array):
     average = array[y][x]
-    for pixel in getNeighbors(x, y, array):
+    neighbors = getNeighbors(x, y, array, 21)
+    for pixel in neighbors:
         average = add_pixel(average, pixel)
-    # return (int(average[0]/9), int(average[1]/9), int(average[2]/9))
-    return (int(average[0]/25), int(average[1]/25), int(average[2]/25))
+    
+    return (int(average[0]/441), int(average[1]/441), int(average[2]/441))
+
+def avg(x, y, array, radius):
+    average = (0, 0, 0)
+    count = 0
+    for y_p in range(y-(radius // 2), y+(radius // 2)+1):
+        for x_p in range(x-(radius // 2), x+(radius // 2)+1):
+            count+=1
+            average = add_pixel(average, array[y_p][x_p])
+
+    return (int(average[0]/(radius*radius)), 
+            int(average[1]/(radius*radius)),
+            int(average[2]/(radius*radius)))
 
 
 def apply_blur_effect(image_path, output_path):
@@ -74,15 +67,11 @@ def apply_blur_effect(image_path, output_path):
     img_array = convert_2d(img["pixels"], height, width)
 
     new_img_array = [[(0,0,0) for x in range(width)] for y in range(height)]
-    # x, y = 100, 100
-    # print(img_array[y][x])
-    # print(getNeighbors(x, y, img_array))
-    # print(get_average(x, y, img_array))
-    # return
+    radius = 21
 
-    for y in range(2, height-2):
-        for x in range(2, width-2):
-            new_img_array[y][x] = get_average(x, y, img_array)
+    for y in range(radius, height-radius):
+        for x in range(radius, width-radius):
+            new_img_array[y][x] = avg(x, y, img_array, radius)
             
     new_pixels = flatten(new_img_array)
 
@@ -94,4 +83,4 @@ def apply_blur_effect(image_path, output_path):
 
 
 # Example usage:
-apply_blur_effect("spider.png", "blurspider.png")
+apply_blur_effect("mount-fuji.png", "blur-fuji.png")
