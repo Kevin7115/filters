@@ -42,12 +42,12 @@ def get_average(x, y, array):
     
     return (int(average[0]/441), int(average[1]/441), int(average[2]/441))
 
+
 def avg(x, y, array, radius):
+    # Combines the getNeighbor and summation process so it runs quicker
     average = (0, 0, 0)
-    count = 0
     for y_p in range(y-(radius // 2), y+(radius // 2)+1):
         for x_p in range(x-(radius // 2), x+(radius // 2)+1):
-            count+=1
             average = add_pixel(average, array[y_p][x_p])
 
     return (int(average[0]/(radius*radius)), 
@@ -67,7 +67,7 @@ def apply_blur_effect(image_path, output_path):
     img_array = convert_2d(img["pixels"], height, width)
 
     new_img_array = [[(0,0,0) for x in range(width)] for y in range(height)]
-    radius = 21
+    radius = 11
 
     for y in range(radius, height-radius):
         for x in range(radius, width-radius):
@@ -83,4 +83,4 @@ def apply_blur_effect(image_path, output_path):
 
 
 # Example usage:
-apply_blur_effect("mount-fuji.png", "blur-fuji.png")
+apply_blur_effect("spider.png", "blurspider.png")
